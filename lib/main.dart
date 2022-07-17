@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:lawn_buddy/data/provider/home_provider.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -11,7 +13,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Lawn Buddy Case Study',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -24,7 +26,9 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: ChangeNotifierProvider(
+          create: (context) => HomeProvider(),
+          child: const MyHomePage(title: 'Flutter Demo Home Page')),
     );
   }
 }
@@ -63,6 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    HomeProvider provider = Provider.of<HomeProvider>(context);
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -75,34 +80,93 @@ class _MyHomePageState extends State<MyHomePage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+      body: SingleChildScrollView(
+        child: Container(
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          child: Center(
+            // Center is a layout widget. It takes a single child and positions it
+            // in the middle of the parent.
+            child: Container(
+              width: MediaQuery.of(context).size.width * 0.9,
+              child: Column(
+                // Column is also a layout widget. It takes a list of children and
+                // arranges them vertically. By default, it sizes itself to fit its
+                // children horizontally, and tries to be as tall as its parent.
+                //
+                // Invoke "debug painting" (press "p" in the console, choose the
+                // "Toggle Debug Paint" action from the Flutter Inspector in Android
+                // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
+                // to see the wireframe for each widget.
+                //
+                // Column has various properties to control how it sizes itself and
+                // how it positions its children. Here we use mainAxisAlignment to
+                // center the children vertically; the main axis here is the vertical
+                // axis because Columns are vertical (the cross axis would be
+                // horizontal).
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  const SizedBox(
+                    height: 50,
+                  ),
+                  TextField(
+                    controller: provider.firstName,
+                    onChanged: ((value) {
+                      provider.onTextChange(Name.first);
+                    }),
+                    decoration: InputDecoration(hintText: 'First Name'),
+                  ),
+                  TextField(
+                    controller: provider.lastName,
+                    onChanged: ((value) {
+                      provider.onTextChange(Name.last);
+                    }),
+                    decoration: InputDecoration(hintText: 'Last Name'),
+                  ),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.8,
+                    child: Expanded(
+                      child: ListView(
+                        children: provider.employees
+                            .map((e) => Card(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Container(
+                                                height: 30,
+                                                width: 30,
+                                                decoration: BoxDecoration(
+                                                    image: DecorationImage(
+                                                        image: NetworkImage(
+                                                            e.avatar))),
+                                              ),
+                                              SizedBox(
+                                                width: 15,
+                                              ),
+                                              Text(
+                                                  '${e.last_name} ${e.first_name}')
+                                            ],
+                                          ),
+                                          TextButton(
+                                              onPressed: () {},
+                                              child: Text(e.companyName!))
+                                        ]),
+                                  ),
+                                ))
+                            .toList(),
+                      ),
+                    ),
+                  )
+                ],
+              ),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
